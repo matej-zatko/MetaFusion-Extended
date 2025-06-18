@@ -522,33 +522,40 @@ class CffFusion():
         self.t_area1 = tmp[14] # exon/utr/intron
         self.t_gene2 = tmp[15]
         self.t_area2 = tmp[16]
+
+        self.t_gene1 = tmp[13] # gene reported by tool
+        self.t_gene_id1 = tmp[14]
+        self.t_area1 = tmp[15] # exon/utr/intron
+        self.t_gene2 = tmp[16]
+        self.t_gene_id2 = tmp[17]
+        self.t_area2 = tmp[18]
         #FOR USE IN annotate_called_fusion_file.py
         self.left = []
         self.right = []
         # Re-annotation Zone
         # ReadThrough     DTX2    cds     DTX2P1-UPK3BP1-PMS2P11  utr3    True    TrueTrue     True    5.5     1       474827  1       F00000001       CCTCCCGCAGGGCCCTGAGCACCCCAATCCCGGAAAGCCGTTCACTGCCAGAGGGTTTCCCCGCCAGTGCTACCTTCCAGACAACGCCCAGGGCCGCAAG    CCTCCAGGGGCTTCCAGAACCCGGAGACACTGGCTGACATTCCGGCCTCCCCACAGCTGCTGACCGATGGCCACTACATGACGCTGCCCGTGTCTCCGGA
-        if len(tmp) >= 33 :
-            self.category = tmp[17]
-            self.reann_gene1 = tmp[18]
-            self.reann_type1 = tmp[19]
-            self.reann_gene2 = tmp[20]
-            self.reann_type2 = tmp[21]
-            self.gene1_on_bndry = tmp[22] # gene1 breakpoint on boundary
-            self.gene1_close_to_bndry = tmp[23] # gene1 breakpoint within 10bp of a boundary
-            self.gene2_on_bndry = tmp[24] # gene2 on boundary
-            self.gene2_close_to_bndry = tmp[25] # gene2 close to boundary
-            self.score = tmp[26]    # score for bpann1 + bpann2
-            self.coding_id_distance = tmp[27]   # difference between two coding fusion genes, if not coding the value is -1
-            self.gene_interval_distance = tmp[28] # distance between two fusion gene intervals
-            self.dnasupp = tmp[29]
-            self.fusion_id = tmp[30]
-            self.seq1 = tmp[31]
-            self.seq2 = tmp[32]
+        if len(tmp) >= 35 :
+            self.category = tmp[19]
+            self.reann_gene1 = tmp[20]
+            self.reann_type1 = tmp[21]
+            self.reann_gene2 = tmp[22]
+            self.reann_type2 = tmp[23]
+            self.gene1_on_bndry = tmp[24] # gene1 breakpoint on boundary
+            self.gene1_close_to_bndry = tmp[25] # gene1 breakpoint within 10bp of a boundary
+            self.gene2_on_bndry = tmp[26] # gene2 on boundary
+            self.gene2_close_to_bndry = tmp[27] # gene2 close to boundary
+            self.score = tmp[28]    # score for bpann1 + bpann2
+            self.coding_id_distance = tmp[29]   # difference between two coding fusion genes, if not coding the value is -1
+            self.gene_interval_distance = tmp[30] # distance between two fusion gene intervals
+            self.dnasupp = tmp[31]
+            self.fusion_id = tmp[32]
+            self.seq1 = tmp[33]
+            self.seq2 = tmp[34]
             self.is_inframe = False
-            self.closest_exon1 = tmp[34] 
-            self.closest_exon2 = tmp[35]
-            self.rna_type1 = tmp[36] 
-            self.rna_type2 = tmp[37] 
+            self.closest_exon1 = tmp[35] 
+            self.closest_exon2 = tmp[36]
+            self.rna_type1 = tmp[37] 
+            self.rna_type2 = tmp[38] 
         else:
             self.category = "NA"    # category
             self.reann_gene1 = "NA"
@@ -572,8 +579,8 @@ class CffFusion():
             self.closest_exon2 = "NA"
             self.rna_type1 = "NA" 
             self.rna_type2 = "NA" 
-            if len(tmp) == 30:
-                self.dnasupp = tmp[29]
+            if len(tmp) == 32:
+                self.dnasupp = tmp[31]
             else:
                 self.dnasupp = -9 # not available
         self.bpann1 = GeneBed("")   # breakpoint1 annotation (GeneBed)
@@ -585,7 +592,7 @@ class CffFusion():
         # same all attrs in a list, for printing    
         self.zone1_attrs = ["chr1", "pos1", "strand1", "chr2", "pos2", "strand2"]
         self.zone2_attrs = ["frame", "sample_name", "sample_type", "disease"]
-        self.zone3_attrs = ["tool", "split_cnt", "span_cnt", "t_gene1", "t_area1", "t_gene2", "t_area2"]
+        self.zone3_attrs = ["tool", "split_cnt", "span_cnt", "t_gene1", "t_gene_id1", "t_area1", "t_gene2", "t_gene_id2","t_area2"]
         #self.zone4_attrs = ["category", "reann_gene1", "reann_type1", "reann_gene2", "reann_type2", "gene1_on_bdry", "gene1_close_to_bndry", "gene2_on_bdry", "gene2_close_to_bndry", "score", "coding_id_distance", "gene_interval_distance", "dna_support", "fusion_id", "seq1", "seq2", "is_inframe", "closest_exon1", "closest_exon2", "captured_reads"]  
         self.zone4_attrs = ["category", "reann_gene1", "reann_type1", "reann_gene2", "reann_type2", "gene1_on_bdry", "gene1_close_to_bndry", "gene2_on_bdry", "gene2_close_to_bndry", "score", "coding_id_distance", "gene_interval_distance", "dna_support", "fusion_id", "seq1", "seq2", "is_inframe", "closest_exon1", "closest_exon2", "rna_type1", "rna_type2"]  
         # format chr

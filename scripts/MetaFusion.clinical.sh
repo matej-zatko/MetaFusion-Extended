@@ -4,8 +4,6 @@ rename=1
 annotate=1
 annotate_exons=1
 merge=1
-isohunter=1
-remove_non_hgnc=1
 fusionannotator=1
 db_filt_ann=1
 RT_call_filter=1
@@ -102,16 +100,30 @@ mkdir $outdir
 #Check CFF file format:
 #Remove entries with nonconformming chromosome name
 #Remove "." from strand field and replace with "NA"
-cat $cff | awk '$1 ~ /[0-9XY]/ && $4 ~ /[0-9XY]/ ' |  awk 'BEGIN{FS=OFS="\t"} $3 !~ /^[-+]$/{$3="NA"} 1' | awk 'BEGIN{FS=OFS="\t"} $6 !~ /^[-+]$/{$6="NA"} 1'   > $outdir/$(basename $cff).reformat 
+cat $cff | awk '$1 ~ /[0-9XY]/ && $4 ~ /[0-9XY]/ ' |  awk 'BEGIN{FS=OFS="\t"} $3 !~ /^[-+]$/{$3="NA"} 1' | awk 'BEGIN{FS=OFS="\t"} $6 !~ /^[-+]$/{$6="NA"} 1' | awk 'BEGIN{FS=OFS="\t"} {if ($15 == ".") $15="NA"; if ($18 == ".") $18="NA";} 1' > $outdir/$(basename $cff).reformat
 cff=$outdir/$(basename $cff).reformat
 #NEED TO INSERT +/-/NA for strand, make NA if other
 
-#Rename cff
+# #Rename cff
+# if [ $rename -eq 1 ]; then
+#   echo Rename cff
+#   python rename_cff_file_genes.MetaFusion.py $cff $gene_info > $outdir/$(basename $cff).renamed
+#   cff=$outdir/$(basename $cff).renamed
+# fi
+ 
+# Rename genes in CFF
 if [ $rename -eq 1 ]; then
-  echo Rename cff
-  python rename_cff_file_genes.MetaFusion.py $cff $gene_info > $outdir/$(basename $cff).renamed
+  echo Rename CFF genes
+  Rscript $fusiontools/rename_cff_genes.R --cff_file=$cff --out_file=$outdir/$(basename $cff).renamed --HGNC_db=$reference_file_dir/hgnc_complete_set_2025-01-06.txt --NCBI_db=$reference_file_dir/Homo_sapiens.gene_info.new --debug
+  cff=$outdir/$(basename $cff).renamed
 fi
-cff=$outdir/$(basename $cff).renamed
+
+# Update ENSEMBL IDs in CFF
+if [ $rename -eq 1 ]; then
+  echo Update CFF gene IDs
+  Rscript $fusiontools/update_cff_ids.R --cff_file=$cff --out_file=$outdir/$(basename $cff).ids_updated --debug
+  cff=$outdir/$(basename $cff).ids_updated
+fi
 
 #Annotate cff
 if [ $annotate -eq 1 ]; then
@@ -145,28 +157,33 @@ if [ $exons -eq 1 ]; then
   cff=$outdir/$(basename $cff).exons
 fi
 
-#Merge
+# Merge
 cluster=$outdir/$(basename $cff).cluster
 if [ $merge -eq 1 ]; then
   echo Merge cff by genes and breakpoints
   echo bash RUN_cluster_genes_breakpoints.sh $cff $outdir $fusiontools \> $cluster
   bash RUN_cluster_genes_breakpoints.sh $cff $outdir $fusiontools > $cluster
+
+  # Only keep unique symbols
+  echo Rscript $fusiontools/remove_duplicated_names.R --cluster=$cluster --out=$outdir/$(basename $cluster).unique_symbols
+  Rscript $fusiontools/remove_duplicated_names.R --cluster=$cluster --out=$outdir/$(basename $cluster).unique_symbols
+  cluster=$outdir/$(basename $cluster).unique_symbols
 fi
 
-#ISOHUNTER
-if [ $isohunter -eq 1 ]; then
-  echo Merge cff by breakpoints to separate isoforms 
-    echo bash $fusiontools/RUN_cluster_breakpoints.sh $cff $outdir $fusiontools $per_sample \> $outdir/$(basename $cff).isoforms.per_sample.cluster 
-    bash $fusiontools/RUN_cluster_breakpoints.sh $cff $outdir $fusiontools $per_sample > $outdir/$(basename $cff).isoforms.per_sample.cluster 
-fi
-cluster=$outdir/$(basename $cff).isoforms.per_sample.cluster
+# #ISOHUNTER
+# if [ $isohunter -eq 1 ]; then
+#   echo Merge cff by breakpoints to separate isoforms 
+#   echo bash $fusiontools/RUN_cluster_breakpoints.sh $cff $outdir $fusiontools $per_sample \> $outdir/$(basename $cff).isoforms.per_sample.cluster 
+#   bash $fusiontools/RUN_cluster_breakpoints.sh $cff $outdir $fusiontools $per_sample > $outdir/$(basename $cff).isoforms.per_sample.cluster 
+#   cluster=$outdir/$(basename $cff).isoforms.per_sample.cluster
+# fi
 
-# REMOVE NON-HGNC
-if [ $remove_non_hgnc -eq 1 ]; then
-  echo Rscript $fusiontools/remove_non_hgnc_metafusion.R --cluster=$cluster --out=$outdir/$(basename $cluster).non_hgnc_removed 
-  Rscript $fusiontools/remove_non_hgnc_metafusion.R --cluster=$cluster --out=$outdir/$(basename $cluster).non_hgnc_removed 
-fi
-cluster=$outdir/$(basename $cluster).non_hgnc_removed
+# # REMOVE NON-HGNC
+# if [ $remove_non_hgnc -eq 1 ]; then
+#   echo Rscript $fusiontools/remove_non_hgnc_metafusion.R --cluster=$cluster --out=$outdir/$(basename $cluster).non_hgnc_removed
+#   Rscript $fusiontools/remove_non_hgnc_metafusion.R --cluster=$cluster --out=$outdir/$(basename $cluster).non_hgnc_removed
+#   cluster=$outdir/$(basename $cluster).non_hgnc_removed
+# fi
 
 #FUSIONANNOTATOR
 reference_files=$(dirname $gene_bed)
@@ -232,15 +249,16 @@ else # Otherwise, proceed normally
 
   # Blocklist Filter
   if [ $blck_filter -eq 1 ]; then
-    echo blocklist filter
-    #echo bash blocklist_filter_recurrent_breakpoints.sh $cff $cluster_RT_call $outdir $recurrent_bedpe
+    echo == blocklist filter ==
+    echo bash blocklist_filter_recurrent_breakpoints.sh $cff $cluster_RT_call $outdir $recurrent_bedpe
     bash blocklist_filter_recurrent_breakpoints.sh $cff $cluster_RT_call $outdir $recurrent_bedpe > $outdir/$(basename $cluster).RT_filter.callerfilter.$num_tools.blck_filter
+    cluster=$outdir/$(basename $cluster).RT_filter.callerfilter.$num_tools.blck_filter
   fi
-  cluster=$outdir/$(basename $cluster).RT_filter.callerfilter.$num_tools.blck_filter
 
   # Adjacent Noncoding filter 
   if [ $ANC_filter -eq 1 ]; then
-    echo ANC adjacent noncoding filter
+    echo == ANC adjacent noncoding filter ==
+    echo bash filter_adjacent_noncoding.py $cluster
     python filter_adjacent_noncoding.py $cluster > $outdir/$(basename $cluster).ANC_filter  
   fi
 fi

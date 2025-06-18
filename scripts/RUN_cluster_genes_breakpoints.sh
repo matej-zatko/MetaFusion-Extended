@@ -16,4 +16,4 @@ fid_clusters_file=$outdir/FID.clusters.tsv
 Rscript $fusiontools_dir/cluster_intersections.R $fid_intersection_file $fid_clusters_file 
 
 # generate cluster file using clustered FIDs and cff file
-python $fusiontools_dir/generate_cluster_file.py $cff $fid_clusters_file
+python $fusiontools_dir/generate_cluster_file.py --choose_bp $cff $fid_clusters_file

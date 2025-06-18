@@ -21,6 +21,9 @@ def intersect_fusions_by_breakpoints():
     header=fusion.zone1_attrs + fusion.zone2_attrs + fusion.zone3_attrs + fusion.zone4_attrs
     df_cff=pd.read_csv(cff, sep='\t', keep_default_na=False, index_col=False, names=header)
     
+    # Combine sample name and chr to allow for only same-sample intersections
+    df_cff['chr1'] = df_cff['chr1'] + "_" + df_cff['sample_name']
+    df_cff['chr2'] = df_cff['chr2'] + "_" + df_cff['sample_name']
     
     #create BedTools object with appropriate column names
     print >> sys.stderr, "create BedTools object with appropriate column names"
@@ -62,6 +65,33 @@ def intersect_fusions_by_genes(cff_file):
 fusion_dict = intersect_fusions_by_genes(cff)
 
 count = df.shape[0] + 1 
+for key in fusion_dict.keys():
+    lst=fusion_dict[key]
+    edges=list(itertools.permutations(lst, 2))
+    for edge in edges:
+        print("\t".join([str(count)] + list(edge)))
+        count += 1
+
+# CLUSTER by ENSEMBL IDs
+
+def intersect_fusions_by_ids(cff_file):
+    fusion_dict = {}
+    fusion_list_for_bp_cmp = []
+    common_key_dict = {}
+    # cluster fusions by gene pairs, save in fusion_dict
+    for line in open(cff_file, "r"):
+        if line.startswith("#"):
+            continue
+        fusion = pygeneann.CffFusion(line)
+        if fusion.t_gene_id1 == "NA" or fusion.t_gene_id2 == "NA":
+            continue
+        else:
+            key = ",".join(sorted([fusion.t_gene_id1, fusion.t_gene_id2])) 
+            fusion_dict.setdefault(key, []).append(fusion.fusion_id)
+    return fusion_dict
+
+fusion_dict = intersect_fusions_by_ids(cff)
+
 for key in fusion_dict.keys():
     lst=fusion_dict[key]
     edges=list(itertools.permutations(lst, 2))

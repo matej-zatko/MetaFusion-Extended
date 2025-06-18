@@ -7,7 +7,7 @@ recurrent_bedpe=$4
 
 #BLOCKLIST FILTER
 cff_bedpe=$(basename $cff).bedpe
-cat $cff | awk '{FS = OFS = "\t"}{print $1,$2,$2+1,$4,$5,$5+1,$31}' | sed 's/chr//g' > $outdir/$cff_bedpe 
+cat $cff | awk '{FS = OFS = "\t"}{print $1,$2,$2+1,$4,$5,$5+1,$33}' | sed 's/chr//g' > $outdir/$cff_bedpe 
 pairToPair -a $recurrent_bedpe -b $outdir/$cff_bedpe -slop 5 > $outdir/recurrent_filtered_fusions.bedpe
 
 # Make sorted blocklist file
