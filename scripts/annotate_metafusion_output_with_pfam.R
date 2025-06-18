@@ -156,7 +156,7 @@ for (i in 1:nrow(metafusion.cluster) ){
   },
   error=function(cond) {
     #message(paste0("Annotation failed for fusion", paste0(gene_name1, "\t", gene_name2)))
-    message(paste0("PFAM Annotation failed for gene1 ",fusion$gene1, ":", gene_name1,  " of fusion: ", paste0(fusion$gene1, ":", gene_name1, "\\t", fusion$gene2, ":", gene_name2)))
+    message(paste0("PFAM Annotation failed for gene1 ",fusion$gene1, ":", gene_name1,  " of fusion: ", paste0(fusion$gene1, "\\t", fusion$gene2)))
     #metafusion.cluster[i,] <- fusion
     return(NA)
   })
@@ -208,7 +208,7 @@ for (i in 1:nrow(metafusion.cluster) ){
 },
         error=function(cond) {
             #message(paste0("Annotation failed for fusion", paste0(gene_name1, "\t", gene_name2)))
-            message(paste0("PFAM Annotation failed for gene1 ",fusion$gene1, ":", gene_name1,  " of fusion: ", paste0(fusion$gene1, ":", gene_name1, "\\t", fusion$gene2, ":", gene_name2)))
+            message(paste0("PFAM Annotation failed for gene2 ",fusion$gene2, ":", gene_name2,  " of fusion: ", paste0(fusion$gene1, "\\t", fusion$gene2)))
             #metafusion.cluster[i,] <- fusion
             return(NA)
         })
