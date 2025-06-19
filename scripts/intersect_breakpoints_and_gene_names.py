@@ -48,9 +48,7 @@ df.to_csv(sys.stdout,header=True,index=True, sep="\t")
 
 def intersect_fusions_by_genes(cff_file):
     fusion_dict = {}
-    fusion_list_for_bp_cmp = []
-    common_key_dict = {}
-    # cluster fusions by gene pairs, save in fusion_dict
+    # cluster fusions by gene pairs AND sample name
     for line in open(cff_file, "r"):
         if line.startswith("#"):
             continue
@@ -58,7 +56,8 @@ def intersect_fusions_by_genes(cff_file):
         if fusion.t_gene1 == "NA" or fusion.t_gene2 == "NA":
             continue
         else:
-            key = ",".join(sorted([fusion.t_gene1 + "|" + fusion.chr1, fusion.t_gene2+ "|" + fusion.chr2])) 
+            # Include sample_name in the key to ensure same-sample intersections only
+            key = fusion.sample_name + "::" + ",".join(sorted([fusion.t_gene1 + "|" + fusion.chr1, fusion.t_gene2+ "|" + fusion.chr2])) 
             fusion_dict.setdefault(key, []).append(fusion.fusion_id)
     return fusion_dict
 
@@ -76,9 +75,7 @@ for key in fusion_dict.keys():
 
 def intersect_fusions_by_ids(cff_file):
     fusion_dict = {}
-    fusion_list_for_bp_cmp = []
-    common_key_dict = {}
-    # cluster fusions by gene pairs, save in fusion_dict
+    # cluster fusions by Ensembl gene ID pairs AND sample name
     for line in open(cff_file, "r"):
         if line.startswith("#"):
             continue
@@ -86,7 +83,8 @@ def intersect_fusions_by_ids(cff_file):
         if fusion.t_gene_id1 == "NA" or fusion.t_gene_id2 == "NA":
             continue
         else:
-            key = ",".join(sorted([fusion.t_gene_id1, fusion.t_gene_id2])) 
+            # Include sample_name in the clustering key
+            key = fusion.sample_name + "::" + ",".join(sorted([fusion.t_gene_id1, fusion.t_gene_id2])) 
             fusion_dict.setdefault(key, []).append(fusion.fusion_id)
     return fusion_dict
 
