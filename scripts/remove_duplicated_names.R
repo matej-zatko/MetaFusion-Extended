@@ -25,6 +25,7 @@ remove_duplicated <- function(genes){
   # input: genes (comma-separated string of gene names)
   genes<- unlist(str_split(genes, pattern=","))
   genes<- unique(genes)
+  return(paste(genes, collapse=","))
 }
 cluster$gene1 <- unlist(lapply(cluster$gene1, remove_duplicated))
 cluster$gene2 <- unlist(lapply(cluster$gene2, remove_duplicated))
