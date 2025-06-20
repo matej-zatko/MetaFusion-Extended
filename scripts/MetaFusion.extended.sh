@@ -110,18 +110,18 @@ cff=$outdir/$(basename $cff).reformat
 #   python rename_cff_file_genes.MetaFusion.py $cff $gene_info > $outdir/$(basename $cff).renamed
 #   cff=$outdir/$(basename $cff).renamed
 # fi
- 
+
 # Rename genes in CFF
 if [ $rename -eq 1 ]; then
   echo Rename CFF genes
-  Rscript $fusiontools/rename_cff_genes.R --cff_file=$cff --out_file=$outdir/$(basename $cff).renamed --HGNC_db=$hgnc_db --NCBI_db=$gene_info --debug
+  Rscript $fusiontools/rename_cff_genes.R --cff_file=$cff --out_file=$outdir/$(basename $cff).renamed --HGNC_db=$hgnc_db --NCBI_db=$gene_info
   cff=$outdir/$(basename $cff).renamed
 fi
 
 # Update ENSEMBL IDs in CFF
 if [ $rename -eq 1 ]; then
   echo Update CFF gene IDs
-  Rscript $fusiontools/update_cff_ids.R --cff_file=$cff --out_file=$outdir/$(basename $cff).ids_updated --debug
+  Rscript $fusiontools/update_cff_ids.R --cff_file=$cff --out_file=$outdir/$(basename $cff).ids_updated
   cff=$outdir/$(basename $cff).ids_updated
 fi
 
