@@ -40,6 +40,10 @@ while test $# -gt 0;do
         gene_info="$2"
         shift 2
         ;;
+        --hgnc_db)
+        hgnc_db="$2"
+        shift 2
+        ;;
         --genome_fasta)
         genome_fasta="$2"
         shift 2
@@ -66,10 +70,6 @@ while test $# -gt 0;do
         ;;
         --annotate_exons)
         exons=1
-        shift
-        ;;
-        --per_sample)
-        per_sample=1
         shift
         ;;
         --update_hist)
@@ -114,7 +114,7 @@ cff=$outdir/$(basename $cff).reformat
 # Rename genes in CFF
 if [ $rename -eq 1 ]; then
   echo Rename CFF genes
-  Rscript $fusiontools/rename_cff_genes.R --cff_file=$cff --out_file=$outdir/$(basename $cff).renamed --HGNC_db=$reference_file_dir/hgnc_complete_set_2025-01-06.txt --NCBI_db=$reference_file_dir/Homo_sapiens.gene_info.new --debug
+  Rscript $fusiontools/rename_cff_genes.R --cff_file=$cff --out_file=$outdir/$(basename $cff).renamed --HGNC_db=$hgnc_db --NCBI_db=$gene_info --debug
   cff=$outdir/$(basename $cff).renamed
 fi
 
