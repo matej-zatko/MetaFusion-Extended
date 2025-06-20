@@ -144,6 +144,10 @@ sub find_overlapping_gencode_genes {
 
     foreach my $gene_id (split(/,/, $gene_id_listing) ) {
 
+        #### Add the gene name (which is the gene_id itself) to the hash
+        $gencode_genes{$gene_id} = 1;
+        ####
+
         print "\t-examining [$gene_id] for overlaps\n" if $DEBUG;
         unless ($gene_id =~ /\w/) { next; }
         
