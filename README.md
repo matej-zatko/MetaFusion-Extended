@@ -93,7 +93,7 @@ bash MetaFusion.extended.sh --outdir $outdir \
                  --per_sample \
                  --recurrent_bedpe $recurrent_bedpe \
                  --scripts $fusiontools \
-		             --database $database \
+                 --database $database \
                  --update_hist \
                  --ref_dir $ref_dir
 ```
