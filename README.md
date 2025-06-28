@@ -46,7 +46,9 @@ You will now be inside the container and ready to run MetaFusion-Extended comman
 
 MetaFusion does not run individual fusion callers. Instead, users are responsible for executing any or all of the supported tools on their RNA-seq data and supplying the resulting outputs. MetaFusion-Extended includes built-in support for the following tools: [Arriba](https://github.com/suhrig/arriba), [STAR-Fusion](https://github.com/STAR-Fusion/STAR-Fusion), [STAR-SEQR](https://github.com/ExpressionAnalysis/STAR-SEQR), [deFuse](https://github.com/amcpherson/defuse), [EricScript](https://github.com/databio/ericscript), [INTEGRATE](https://sourceforge.net/projects/integrate-fusion/), [FusionMap](https://doi.org/10.1093/bioinformatics/btr310), [Cicero](https://github.com/stjude/CICERO), and [FusionCatcher](https://github.com/ndaniel/fusioncatcher). The following diagram illustrates the workflow of MetaFusion-Extended.
 
+<div align="center">
 <img src="./images/metafusion_schematic.png" width="500">
+</div>
 
 ### Generating CFF files
 
