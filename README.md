@@ -1,6 +1,6 @@
 # MetaFusion-Extended
 
-MetaFusion-Extended is an extension of [MetaFusion Clinical](https://github.com/ccmbioinfo/MetaFusion-Clinical) that adds enhanced gene symbol unification and graph-based clustering using gene identifiers to improve the merging of fusion calls across multiple tools. 
+MetaFusion-Extended is an extension of [MetaFusion Clinical](https://github.com/ccmbioinfo/MetaFusion-Clinical) that adds enhanced gene symbol unification and graph-based clustering using gene identifiers to improve the merging of fusion calls across multiple tools. In addition, support for [FusionCatcher](https://github.com/ndaniel/fusioncatcher) has been added.
 
 In both the original MetaFusion and MetaFusion Clinical, gene renaming relies on the NCBI database to update gene names to their official symbols. However, this step can fail if a gene symbol is missing from the database, leading to unsuccessful merging based on gene names. To mitigate this problem, MetaFusion-Extended integrates multiple gene symbol databases: [NCBI](https://www.ncbi.nlm.nih.gov/gene/), [HGNC](https://www.genenames.org/), and [org.Hs.eg.db](https://bioconductor.org/packages/release/data/annotation/html/org.Hs.eg.db.html). Additionally, gene symbols are not stable and may change or even be removed over time. To address this, MetaFusion-Extended incorporates Ensembl gene IDs alongside gene symbols and breakpoints into its graph clustering step (see the [original MetaFusion manuscript](https://academic.oup.com/bioinformatics/article/37/19/3144/6263829)) to improve fusion call merging across different tools.
 
@@ -30,7 +30,7 @@ docker pull mapostolides/metafusion:readxl_writexl
 
 ### Step 3: Download reference files
 
-Reference files have to be downloaded separately from [here](https://drive.google.com/file/d/1pxKYmG3LYOccdJWnfhDZ-LDARuMiace6/view?usp=sharing), unzipped and placed inside the MetaFusion-Extended folder (`MetaFusion-Extended/reference_files`).
+Reference files have to be downloaded separately from [here](https://drive.google.com/file/d/1pxKYmG3LYOccdJWnfhDZ-LDARuMiace6/view?usp=sharing), unzipped and placed inside the MetaFusion-Extended folder (`MetaFusion-Extended/reference_files`). The reference files are identical to [those provided by MetaFusion Clinical](https://github.com/ccmbioinfo/MetaFusion-Clinical/wiki#reference-files), with the following additions: the HGNC database (`hgnc_complete_set_2025-01-06.txt`), an updated NCBI database (`Homo_sapiens.gene_info.new`) and an empty database to track historical calls, clinically relevant fusions, and false positives (`historical_database.db`). The org.Hs.eg.db database is not included in the reference files, as it is already incorporated in the code via the [corresponding Bioconductor package](https://doi.org/doi:10.18129/B9.bioc.org.Hs.eg.db).
 
 ### Step 4: Run the container
 
@@ -43,6 +43,10 @@ docker run --name MetaFusion-Extended --rm -it --entrypoint /bin/bash -v /your/l
 You will now be inside the container and ready to run MetaFusion-Extended commands from within the `/MetaFusion` directory.
 
 ## Usage
+
+MetaFusion does not run individual fusion callers. Instead, users are responsible for executing any or all of the supported tools on their RNA-seq data and supplying the resulting outputs. MetaFusion-Extended includes built-in support for the following tools: [Arriba](https://github.com/suhrig/arriba), [STAR-Fusion](https://github.com/STAR-Fusion/STAR-Fusion), [STAR-SEQR](https://github.com/ExpressionAnalysis/STAR-SEQR), [deFuse](https://github.com/amcpherson/defuse), [EricScript](https://github.com/databio/ericscript), [INTEGRATE](https://sourceforge.net/projects/integrate-fusion/), [FusionMap](https://doi.org/10.1093/bioinformatics/btr310), [Cicero](https://github.com/stjude/CICERO), and [FusionCatcher](https://github.com/ndaniel/fusioncatcher). The following diagram illustrates the workflow of MetaFusion-Extended.
+
+<img src="./images/metafusion_schematic.png" width="500">
 
 ### Generating CFF files
 
@@ -123,7 +127,7 @@ bash MetaFusion.extended.sh --outdir /MetaFusion/outputs/BRCA \
 
 ### Benchmarking
 
-The performance of MetaFusion-Extended can be benchmarked using the included FusionBenchmarking toolkit. By comparing the final output with a truth set of fusions known to be in the sample, the toolkit will mark fusion calls as either true positives (TP), false positives (FP) or false negatives (FN). More information about the toolkit can be found [here](https://github.com/ccmbioinfo/MetaFusion/wiki/benchmarking_toolkit).
+The performance of MetaFusion-Extended can be optionally benchmarked using the included FusionBenchmarking toolkit. By comparing the final output with a truth set of fusions known to be in the sample, the toolkit will mark fusion calls as either true positives (TP), false positives (FP) or false negatives (FN). More information about the toolkit can be found [here](https://github.com/ccmbioinfo/MetaFusion/wiki/benchmarking_toolkit).
 
 Run the benchmarking toolkit using the following command:
 
